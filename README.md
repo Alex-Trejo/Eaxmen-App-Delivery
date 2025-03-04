@@ -1,3 +1,4 @@
+
 # APP-MOVIL-PRW
 
 Hemos desarrollado una aplicación móvil innovadora para entregas que automatiza procesos en la gestión de pedidos online. Esta aplicación facilita el transporte de productos mediante diversos medios, como motocicletas, camiones y camionetas, utilizando una página web como plataforma central.
@@ -126,5 +127,6 @@ Estas son las dependencias actuales del proyecto, según el archivo package.json
 
 ## Derechos de autor 
 
-© 2024 PROWESS AGRÍCOLA
+© 2025 Alex Trejo
+
 
