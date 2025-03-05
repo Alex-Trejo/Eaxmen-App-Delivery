@@ -3,24 +3,50 @@ import { fs } from "../../database/firebase.js";
 
 export async function createOrder(req, res) {
     try {
-        const { 
-            direccion, nombre, apellido, pedido, cantidad, precio, 
-            comentario, factura, formaPago, billetePago 
-        } = req.body;
+        const { direccion, nombre, apellido, pedido, cantidad, precio, comentario, factura, formaPago, billetePago } = req.body;
 
         // Validar los campos obligatorios
         if (!direccion || !nombre || !apellido || !pedido || !cantidad || !precio || !formaPago) {
             return res.status(400).json({ message: "Todos los campos obligatorios deben ser completados" });
         }
 
-        // Validar los datos de la factura
-        if (!factura || !factura.cedulaRuc || !factura.numeroCelular || !factura.correo || !factura.direccion) {
-            return res.status(400).json({ message: "Los datos de la factura son obligatorios" });
+        let facturaData = null; // Variable para almacenar la factura procesada
+        let billetePagoData = billetePago;
+
+        // Manejar el caso de pago con transferencia sin factura
+        if (formaPago === "transferencia" && !factura) {
+            facturaData = "Pago con transferencia";
+            billetePagoData = "Pago con transferencia";
         }
 
-        // Si la forma de pago es efectivo, el billetePago es obligatorio
-        if (formaPago === "efectivo" && !billetePago) {
-            return res.status(400).json({ message: "Debe proporcionar el billete con el que va a pagar" });
+        // Manejar el caso de pago en efectivo sin factura
+        if (formaPago === "efectivo" && !factura) {
+            facturaData = "Pago en efectivo";
+        }
+
+        // Si la forma de pago es efectivo, el billetePago es obligatorio y debe ser múltiplo de 5
+        if (formaPago === "efectivo") {
+            if (!billetePago) {
+                return res.status(400).json({ message: "Debe proporcionar el billete con el que va a pagar" });
+            }
+            if (billetePago % 5 !== 0) {
+                return res.status(400).json({ message: "El billete de pago debe ser múltiplo de 5" });
+            }
+        }
+
+        // Si el usuario habilitó la factura, debe proporcionar los datos obligatorios
+        if (factura && typeof factura === "object") {
+            if (!factura.cedulaRuc || !factura.numeroCelular || !factura.correo || !factura.direccion) {
+                return res.status(400).json({ message: "Los datos de la factura son obligatorios" });
+            }
+            // Guardar la factura correctamente
+            facturaData = {
+                cedulaRuc: factura.cedulaRuc,
+                numeroCelular: factura.numeroCelular,
+                correo: factura.correo,
+                direccion: factura.direccion,
+                formaPago
+            };
         }
 
         // Construcción del objeto de orden
@@ -32,14 +58,9 @@ export async function createOrder(req, res) {
             cantidad,
             precio,
             comentario: comentario || "",
-            factura: {
-                cedulaRuc: factura.cedulaRuc,
-                numeroCelular: factura.numeroCelular,
-                correo: factura.correo,
-                direccion: factura.direccion
-            },
+            factura: facturaData, // Se asigna el valor procesado
             formaPago,
-            billetePago: formaPago === "efectivo" ? billetePago : null, // Solo se guarda si es efectivo
+            billetePago: billetePagoData, // Se asigna el valor procesado
             vuelto: formaPago === "efectivo" ? billetePago - precio : 0 // Calcula el vuelto si es efectivo
         };
 
