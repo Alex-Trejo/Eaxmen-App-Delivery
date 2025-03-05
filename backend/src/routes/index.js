@@ -5,6 +5,7 @@ import dishRoute from './routes/dishRoutes.js'
 import lunchRoute from "./routes/lunchRoutes.js"; // Ruta correcta a lunchRoutes.
 import adminRoute from './routes/adminRoute.js'
 import motorizedRoute from './routes/motorizedRoute.js'
+import ordersRoute from './routes/ordersRoute.js'
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router.use('/dishes', dishRoute);
 router.use("/lunches", lunchRoute);
 router.use('/admin', adminRoute)
 router.use('/motorized', motorizedRoute);
+router.use('/orders', ordersRoute);
 
 
 export default router;
