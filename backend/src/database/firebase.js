@@ -19,3 +19,4 @@ const storage = getStorage(app);
 const fs = getFirestore(app);
 
 export { fs, getDownloadURL, ref, storage, uploadBytes };
+    
