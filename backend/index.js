@@ -25,19 +25,19 @@ app.setMaxListeners(0);
 app.use("/api", routes);
 
 app.get("/", (req, res) => {
-  res.send("¡Bienvenido, PGA!");
+  res.send("¡Bienvenido, Sabor Dorado");
 });
 
 app.post("/", (req, res) => {
-  res.send("¡Bienvenido, PGA!");
+  res.send("¡Bienvenido, Sabor Dorado");
 });
 
 app.put("/", (req, res) => {
-  res.send("¡Bienvenido, PGA!");
+  res.send("¡Bienvenido, Sabor Dorado");
 });
 
 app.delete("/", (req, res) => {
-  res.send("¡Bienvenido, PGA!");
+  res.send("¡Bienvenido, Sabor Dorado");
 });
 
 app.use((req, res) => {
