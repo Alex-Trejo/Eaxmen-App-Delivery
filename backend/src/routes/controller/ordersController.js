@@ -208,8 +208,23 @@ export async function assignMotorized(req, res) {
         const q = query(usersRef, where("role", "==", "motorizado"));
         const querySnapshot = await getDocs(q);
 
-        // Verificar si el motorizado con el ID existe
+        // Verificar si se encontró algún motorizado con el rol adecuado
         if (querySnapshot.empty) {
+            console.log(`No se encontró ningún motorizado con el rol 'motorizado'`);
+            return res.status(404).json({ message: "El motorizado no existe o no tiene el rol adecuado" });
+        }
+
+        let motorizedExists = false;
+        // Verificar si el motorizado con el ID existe
+        querySnapshot.forEach(doc => {
+            const userData = doc.data();
+            console.log(`Verificando motorizado: ${userData.id} === ${motorizedId}`);
+            if (userData.id === motorizedId) {
+                motorizedExists = true;
+            }
+        });
+
+        if (!motorizedExists) {
             console.log(`No se encontró un motorizado con ID ${motorizedId}`);
             return res.status(404).json({ message: "El motorizado no existe o no tiene el rol adecuado" });
         }
