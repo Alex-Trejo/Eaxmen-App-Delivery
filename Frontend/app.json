@@ -1,8 +1,8 @@
 {
   "expo": {
-    "icon": "./assets/sabrosura logo.png",
-    "name": "La Sabrosura",
-    "slug": "Frontend",
+    "icon": "./assets/favicon.png",
+    "name": "Sabor Dorado",
+    "slug": "sabor-dorado",
     "version": "1.0.0",
     "orientation": "portrait",
     "plugins": [
@@ -26,11 +26,13 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
       ],
-      "package": "com.jiproano1.Frontend",
+      "package": "com.alex.Frontend",
       "config": {
-        "useAab": false
+        
       }
     },
     "web": {
@@ -43,8 +45,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "aabd7e39-2c72-4292-abf3-9ff36dfdb8e4"
+        "projectId": "3b6f2381-d4ec-4197-86b1-3d8954c54716"
       }
-    }
+    },
+    "owner": "alpha001"
   }
 }

@@ -3,6 +3,11 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, RefreshControl} from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { host } from '../../Host';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Usando MaterialIcons, pero puedes usar otro
+import { FontAwesome } from '@expo/vector-icons'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+
 
 const iconUser = require('../../assets/user.png');
 const iconArrow = require('../../assets/right-arrow.png');
@@ -14,7 +19,16 @@ const HomePageClient = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
+  
+
   const fetchProducts = async () => {
+    
+    const userId = await AsyncStorage.getItem("userId");
+  if (!userId) {
+    Alert.alert("Error", "No hay usuario autenticado. Inicia sesión antes de hacer un pedido.");
+    return;
+  }
+    
     try {
       const response = await fetch(`${host}/api/lunches`);
       if (!response.ok) {
@@ -64,8 +78,15 @@ const HomePageClient = () => {
     <View style={styles.container}>
       
       <View style={styles.containerRow}>
-        <Text style={styles.titleText}>Bienvenido</Text>
-      </View>
+            <Text style={styles.titleText}>Bienvenido</Text>
+
+            <TouchableOpacity
+                style={styles.iconContainer}
+                onPress={() => navigation.navigate('UserOrders')} // Navegar a 'UserOrders' cuando se presione
+            >
+            <FontAwesome name="th-list" size={24} color="black" style={{ marginRight: 20 }} />
+            </TouchableOpacity>
+        </View>
 
       <View style={styles.contentContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>

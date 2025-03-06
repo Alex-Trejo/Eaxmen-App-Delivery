@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { host } from '../Host';
 import * as Animatable from 'react-native-animatable';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iconUser = require('../assets/user.png');
 const eyeIcon = require('../assets/eye.png');
@@ -93,7 +94,7 @@ export default function Login() {
               email,
               phoneNumber,
               password,
-              role: 'cliente'
+              role: 'cliente',
             });
             setIsRegistered(true);
           // } else {
@@ -111,12 +112,31 @@ export default function Login() {
         }
 
         if (!hasError) {
-          const response = await axios.post(`${host}/api/auth/login`, {
-            email,
-            password,
-          });
-          redirectToHomePage(response.data.rol);
+          try {
+            const response = await axios.post(`${host}/api/auth/login`, {
+              email,
+              password,
+            });
+        
+            if (response.data.estado) {
+              const { userId, usuario } = response.data;
+        
+              if (userId && usuario?.token) {
+                await AsyncStorage.setItem("userId", userId); // Guarda el userId
+                await AsyncStorage.setItem("token", usuario.token); // Guarda el token
+                redirectToHomePage(response.data.rol);
+              } else {
+                console.error("Datos de usuario o token no válidos");
+              }
+            } else {
+              console.error("Error en login:", response.data.mensaje);
+            }
+          } catch (error) {
+            console.error("Error en la solicitud de login:", error);
+          }
         }
+        
+      
       }
     } catch (error) {
       console.error('Error:', error.message);

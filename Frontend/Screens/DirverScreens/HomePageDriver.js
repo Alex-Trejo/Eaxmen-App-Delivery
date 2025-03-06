@@ -57,14 +57,14 @@ export default function HomePageDriver() {
       </View>
 
       {/* Botones */}
-      <View style={styles.buttonContainer}>
+      {/* <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => {}}>
           <Text style={styles.buttonText}>Aceptar Pedidos</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleNavigateToOrdersMotor}>
           <Text style={styles.buttonText}>Ir a Pedidos</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <View style={styles.containerBody}>
         <ScrollView>
@@ -73,7 +73,7 @@ export default function HomePageDriver() {
           </View>
 
           {/* Notificaciones de pedidos pendientes */}
-          <View style={styles.containerListView}>
+          {/* <View style={styles.containerListView}>
             <View style={styles.container20padding}>
               <Text style={styles.titleTextMenu}>Pedidos</Text>
               <Text style={styles.secondaryText}>Notificaciones de pedidos pendientes</Text>
@@ -97,7 +97,7 @@ export default function HomePageDriver() {
                 </View>
               </View>
             ))}
-          </View>
+          </View> */}
 
           {/* Mapa */}
           <TouchableOpacity style={styles.mapContainer} onPress={handleNavigateToLocation}>

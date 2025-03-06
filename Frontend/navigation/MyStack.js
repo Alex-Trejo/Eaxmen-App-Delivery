@@ -21,6 +21,11 @@ import UserGestion from '../Screens/AdminScreens/UsersGestion.js'
 import HomePageDriver from '../Screens/DirverScreens/HomePageDriver.js'
 import AddRemoveUsers from '../Screens/AdminScreens/AddRemoveUsers.js';
 import MenuManagement_Plate from '../Screens/AdminScreens/Menu_managementPlate.js';
+
+import MenuManagementOrders from '../Screens/AdminScreens/Menu_ManagementOrders.js'; 
+
+import UserOrders from '../Screens/ClientScreens/UserOrders.js';
+
 import CreateProduct from '../Screens/AdminScreens/CreateProduct.js';
 import AddLunchPage from '../Screens/AdminScreens/AddLunchPage.js';
 import EditProduct  from '../Screens/AdminScreens/EditProduct.js';
@@ -42,7 +47,7 @@ const MyStack = () => {
                 name='HomePageClient'
                 component={HomePageClients}
                 options={({ navigation }) => ({
-                    title: 'Inicio', // Título de la pantalla
+                    title: '', // Título de la pantalla
                     headerStyle: {
                         backgroundColor: '#B64107', // Color de fondo de la barra de navegación
                         height: 95, // Altura de la barra de navegación
@@ -62,10 +67,10 @@ const MyStack = () => {
         name='HomePageAdmin'
         component={HomePageAdmin}
         options={{
-            title: 'Inicio', // Eliminar el título
+            title: '', // Eliminar el título
             headerStyle: {
                 backgroundColor: '#B64107', // Cambiar el color de la barra de navegación
-                height: 95, // Ajustar la altura de la barra de navegación
+                height: 65, // Ajustar la altura de la barra de navegación
             },
             headerTintColor: '#fff', // Cambiar el color de la flecha de regreso a blanca
         }}
@@ -74,7 +79,7 @@ const MyStack = () => {
                 name='HomePageDriver'
                 component={HomePageDriver}
                 options={{
-                    title: 'Inicio', // Eliminar el título
+                    title: '', // Eliminar el título
                     headerStyle: {
                         backgroundColor: '#B64107', // Cambiar el color de la barra de navegación
                         height: 95, // Ajustar la altura de la barra de navegación
@@ -251,7 +256,7 @@ const MyStack = () => {
                 title: '', // Eliminar el título
                 headerStyle: {
                     backgroundColor: '#B64107', // Cambiar el color de la barra de navegación
-                    height: 95, // Ajustar la altura de la barra de navegación
+                    height: 65, // Ajustar la altura de la barra de navegación
                 },
                 headerTintColor: '#fff', // Cambiar el color de la flecha de regreso a blanca
 
@@ -262,10 +267,10 @@ const MyStack = () => {
             name='CreateProduct'
             component={CreateProduct}
             options={{
-                title: 'CreateProduct', // Eliminar el título
+                title: 'Agregar platillo', // Eliminar el título
                 headerStyle: {
                     backgroundColor: '#B64107', // Cambiar el color de la barra de navegación
-                    height: 95, // Ajustar la altura de la barra de navegación
+                    height: 65, // Ajustar la altura de la barra de navegación
                 },
                 headerTintColor: '#fff', // Cambiar el color de la flecha de regreso a blanca
 
@@ -314,7 +319,7 @@ const MyStack = () => {
             }}
             />
 
-<Stack.Screen
+        <Stack.Screen
           name="AddRemoveUsers"
           component={AddRemoveUsers}
           options={{
@@ -326,6 +331,35 @@ const MyStack = () => {
             headerTintColor: '#fff', // Color de la flecha de regreso
           }}
         />
+
+    <Stack.Screen
+          name="MenuManagementOrders"
+          component={MenuManagementOrders}
+          options={{
+            title: 'Gestión de Pedidos', // Título de la pantalla
+            headerStyle: {
+              backgroundColor: '#B64107', // Color de fondo de la barra de navegación
+              height: 65, // Altura de la barra de navegación
+            },
+            headerTintColor: '#fff', // Color de la flecha de regreso
+          }}
+        />
+
+
+        <Stack.Screen
+                name="UserOrders"
+                component={UserOrders}
+                options={{
+                    title: 'Pedidos Relizados', // Título de la pantalla
+                    headerStyle: {
+                    backgroundColor: '#B64107', // Color de fondo de la barra de navegación
+                    height: 85, // Altura de la barra de navegación
+                    },
+                    headerTintColor: '#fff', // Color de la flecha de regreso
+                }}
+                />
+
+
 			
         </Stack.Navigator>
     );

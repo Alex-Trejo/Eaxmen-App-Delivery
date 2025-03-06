@@ -110,6 +110,12 @@ const HomePageAdmin = () => {
                     }>
                     {/* Botones */}
                     <View style={styles.buttonContainer}>
+                    <ScrollView
+                contentContainerStyle={styles.buttonScrollView}
+                horizontal
+                showsHorizontalScrollIndicator={false} // Oculta la barra de desplazamiento horizontal
+            >
+
                         <TouchableOpacity
                             style={styles.button}
                             onPress={() => {
@@ -129,6 +135,22 @@ const HomePageAdmin = () => {
                         >
                             <Text style={styles.buttonText}>Gestionar Usuarios</Text>
                         </TouchableOpacity>
+
+
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => {
+                                console.log('Button pressed ClientList');
+                                navigation.navigate('MenuManagementOrders');
+                            }}
+                        >
+                            <Text style={styles.buttonText}>Gestionar Pedidos</Text>
+                        </TouchableOpacity>
+
+                        </ScrollView>
+
+
+
                     </View>
 
                     {/* Lista de Productos */}
@@ -218,25 +240,38 @@ const styles = StyleSheet.create({
     },
     scrollViewContent: {
         paddingVertical: 20,
+        
     },
     buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginBottom: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexWrap: 'nowrap',
+        marginTop: 10,
+       
     },
+    buttonScrollView: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'nowrap', // Asegura que los botones no se envuelvan
+    },
+
     button: {
         backgroundColor: '#ffffff',
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        borderRadius: 25,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderRadius: 35,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 2,
-        elevation: 5,
-        width: '45%',
-        borderWidth: 1,
+        elevation: 10,
+        width: 170,
+        marginRight: 20,
+        borderWidth: 0,
         borderColor: '#ffffff',
+        marginBottom: 25,
     },
     buttonText: {
         color: '#777',

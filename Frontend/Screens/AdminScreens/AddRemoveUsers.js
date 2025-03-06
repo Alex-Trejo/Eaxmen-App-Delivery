@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar, Text, View, FlatList, Alert, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import axios from 'axios';
-import { host } from '../../Host'; // Ajusta la ruta según la ubicación de Host.js
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Si usas AsyncStorage para almacenar el token
+import { host } from '../../Host';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddRemoveUsers = () => {
   const [users, setUsers] = useState([]);
@@ -14,7 +14,7 @@ const AddRemoveUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const token = await AsyncStorage.getItem('userToken'); // O de donde obtengas tu token
+      const token = await AsyncStorage.getItem('userToken');
       const response = await axios.get(`${host}/api/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -24,14 +24,14 @@ const AddRemoveUsers = () => {
       setIsLoading(false);
     } catch (error) {
       console.error('Error fetching users:', error.message);
-      Alert.alert('Error', 'Ocurrió un error al obtener los usuarios. Por favor, revisa tu conexión a Internet y la URL del servidor.');
+      Alert.alert('Error', 'No se pudieron obtener los usuarios.');
       setIsLoading(false);
     }
   };
 
   const handleDeleteUser = async (userId) => {
     try {
-      const token = await AsyncStorage.getItem('userToken'); // O de donde obtengas tu token
+      const token = await AsyncStorage.getItem('userToken');
       await axios.delete(`${host}/api/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -40,14 +40,16 @@ const AddRemoveUsers = () => {
       setUsers(users.filter(user => user.id !== userId));
     } catch (error) {
       console.error('Error deleting user:', error.message);
-      Alert.alert('Error', 'Ocurrió un error al eliminar el usuario. Por favor, revisa tu conexión a Internet y la URL del servidor.');
+      Alert.alert('Error', 'No se pudo eliminar el usuario.');
     }
   };
 
   const handleChangeRole = async (userId, currentRole) => {
     try {
-      const token = await AsyncStorage.getItem('userToken'); // O de donde obtengas tu token
-      const newRole = currentRole === 'cliente' ? 'admin' : 'cliente';
+      const token = await AsyncStorage.getItem('userToken');
+      const newRole = currentRole === 'cliente' ? 'admin' 
+                    : currentRole === 'admin' ? 'motorizado' 
+                    : 'cliente';
       await axios.patch(`${host}/api/users/${userId}/role`, { role: newRole }, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -56,63 +58,49 @@ const AddRemoveUsers = () => {
       setUsers(users.map(user => user.id === userId ? { ...user, role: newRole } : user));
     } catch (error) {
       console.error('Error changing user role:', error.message);
-      Alert.alert('Error', 'Ocurrió un error al cambiar el rol del usuario. Por favor, revisa tu conexión a Internet y la URL del servidor.');
+      Alert.alert('Error', 'No se pudo cambiar el rol del usuario.');
     }
   };
 
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#febd3d" />
+        <ActivityIndicator size="large" color="#007AFF" />
       </View>
     );
   }
 
-  const clientes = users.filter(user => user.role === 'cliente');
-  const admins = users.filter(user => user.role === 'admin');
+  const renderUserList = (title, data) => (
+    <>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      <View style={styles.sectionContainer}>
+        <FlatList
+          data={data}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.userItem}>
+              <Text style={styles.userText}>{item.username}</Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.roleButton} onPress={() => handleChangeRole(item.id, item.role)}>
+                  <Text style={styles.roleButtonText}>Cambiar Rol</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteUser(item.id)}>
+                  <Text style={styles.deleteButtonText}>Eliminar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        />
+      </View>
+    </>
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Administrar Usuarios</Text>
-      
-      <Text style={styles.sectionTitle}>Clientes</Text>
-      <FlatList
-        data={clientes}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.userItem}>
-            <Text style={styles.userText}>{item.username}</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.roleButton} onPress={() => handleChangeRole(item.id, item.role)}>
-                <Text style={styles.roleButtonText}>Cambiar Rol</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteUser(item.id)}>
-                <Text style={styles.deleteButtonText}>Eliminar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-      />
-      
-      <Text style={styles.sectionTitle}>Admins</Text>
-      <FlatList
-        data={admins}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.userItem}>
-            <Text style={styles.userText}>{item.username}</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.roleButton} onPress={() => handleChangeRole(item.id, item.role)}>
-                <Text style={styles.roleButtonText}>Cambiar Rol</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteUser(item.id)}>
-                <Text style={styles.deleteButtonText}>Eliminar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-      />
-
+      {renderUserList("Clientes", users.filter(user => user.role === 'cliente'))}
+      {renderUserList("Admins", users.filter(user => user.role === 'admin'))}
+      {renderUserList("Motorizados", users.filter(user => user.role === 'motorizado'))}
       <StatusBar style="auto" />
     </View>
   );
@@ -120,12 +108,12 @@ const AddRemoveUsers = () => {
 
 export default AddRemoveUsers;
 
-// Estilos del componente
+// Estilos mejorados
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F4F4F4',
   },
   loadingContainer: {
     flex: 1,
@@ -134,47 +122,75 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: '#333',
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginVertical: 10,
+    marginTop: 20,
+    marginBottom: 10,
+    color: '#444',
+  },
+  sectionContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
   userItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#E0E0E0',
   },
   userText: {
-    fontSize: 16,
+    fontSize: 18,
+    color: '#333',
   },
   buttonContainer: {
     flexDirection: 'row',
   },
   roleButton: {
-    backgroundColor: '#4d79ff',
-    padding: 10,
+    backgroundColor: '#CC8636FF',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 20,
-    marginRight: 10,
+    marginRight: 8,
+    shadowColor: "#CC8636FF",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   roleButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
+    fontSize: 14,
     fontWeight: 'bold',
   },
   deleteButton: {
-    backgroundColor: '#ff4d4d',
-    padding: 10,
+    backgroundColor: '#D32F2F',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 20,
+    shadowColor: "#D32F2F",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   deleteButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
+    fontSize: 14,
     fontWeight: 'bold',
   },
 });

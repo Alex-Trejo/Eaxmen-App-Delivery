@@ -7,6 +7,12 @@ import * as Location from 'expo-location';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { host } from '../../Host';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
+
+
 
 const Cart = () => {
   const navigation = useNavigation();
@@ -68,6 +74,14 @@ const Cart = () => {
 
   const handleVerification = async () => {
     console.log("Iniciando verificación de pedido...");
+
+    const userId = await AsyncStorage.getItem("userId");
+    if (!userId) {
+      Alert.alert("Error", "No hay usuario autenticado. Inicia sesión antes de hacer un pedido.");
+      return;
+    }
+
+
     //Validar campos obligatorios de nombre y apellido
     if (!name) {
       Alert.alert(
@@ -199,10 +213,11 @@ const Cart = () => {
       //   paymentMethod: paymentMethod,
       //   changeFor: paymentMethod === 'efectivo' ? changeFor : 'N/A',
       //   location: location ? `https://www.google.com/maps/search/?api=1&query=${location.coords.latitude},${location.coords.longitude}` : 'Ubicación no disponible'
-            direccion: location ? `https://www.google.com/maps/search/?api=1&query=${location.coords.latitude},${location.coords.longitude}` : '', // Ubicación
-            nombre: name.split(' ')[0], // Extrae el primer nombre
-            apellido: name.split(' ')[1] || '', // Extrae el apellido si lo hay
-            pedido: cartItems.map(item => ({
+      userId,      
+      direccion: location ? `https://www.google.com/maps/search/?api=1&query=${location.coords.latitude},${location.coords.longitude}` : '', // Ubicación
+      nombre: name.split(' ')[0], // Extrae el primer nombre
+      apellido: name.split(' ')[1] || '', // Extrae el apellido si lo hay
+      pedido: cartItems.map(item => ({
                   id: item.id,
                   name: item.name,
                   price: item.price,
@@ -221,7 +236,7 @@ const Cart = () => {
       console.log("Datos del pedido a enviar:", JSON.stringify(orderData, null, 2));
 
       try {
-        const response = await axios.post('https://eaxmen-app-delivery.vercel.app/api/orders/order', orderData);
+        const response = await axios.post(`${host}/api/orders/order`, orderData);
         if (response.status === 201) {
           Alert.alert("Éxito", "Pedido realizado con éxito", [{ text: "OK" ,
             onPress: () => {
