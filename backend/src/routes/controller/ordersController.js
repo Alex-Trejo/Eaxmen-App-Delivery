@@ -204,27 +204,12 @@ export async function assignMotorized(req, res) {
         // Referencia a la colección de usuarios
         const usersRef = collection(fs, "usuario");
 
-        // Consultar los usuarios con el rol de 'motorizado'
-        const q = query(usersRef, where("role", "==", "motorizado"));
-        const querySnapshot = await getDocs(q);
+        // Buscar al usuario directamente con el ID de documento (motorizedId)
+        const userRef = doc(fs, "usuario", motorizedId);
+        const userSnap = await getDoc(userRef);
 
-        // Verificar si se encontró algún motorizado con el rol adecuado
-        if (querySnapshot.empty) {
-            console.log(`No se encontró ningún motorizado con el rol 'motorizado'`);
-            return res.status(404).json({ message: "El motorizado no existe o no tiene el rol adecuado" });
-        }
-
-        let motorizedExists = false;
-        // Verificar si el motorizado con el ID existe
-        querySnapshot.forEach(doc => {
-            const userData = doc.data();
-            console.log(`Verificando motorizado: ${userData.id} === ${motorizedId}`);
-            if (userData.id === motorizedId) {
-                motorizedExists = true;
-            }
-        });
-
-        if (!motorizedExists) {
+        // Verificar si el motorizado existe y tiene el rol adecuado
+        if (!userSnap.exists() || userSnap.data().role !== 'motorizado') {
             console.log(`No se encontró un motorizado con ID ${motorizedId}`);
             return res.status(404).json({ message: "El motorizado no existe o no tiene el rol adecuado" });
         }
@@ -250,3 +235,4 @@ export async function assignMotorized(req, res) {
         return res.status(500).json({ message: "Error al asignar motorizado", error: error.message });
     }
 }
+
