@@ -205,7 +205,7 @@ export async function assignMotorized(req, res) {
         const usersRef = collection(fs, "usuario");
 
         // Consultar los usuarios con el rol de 'motorizado'
-        const q = query(usersRef, where("role", "==", "motorizado"), where("userId", "==", motorizedId));
+        const q = query(usersRef, where("role", "==", "motorizado"), where("Id", "==", motorizedId));
         const querySnapshot = await getDocs(q);
 
         // Verificar si el motorizado con el ID existe
