@@ -3,7 +3,12 @@ import { fs } from "../../database/firebase.js";
 
 export async function createOrder(req, res) {
     try {
-        const { direccion, nombre, apellido, pedido, cantidad, precio, comentario, factura, formaPago, billetePago } = req.body;
+        const { userId,direccion, nombre, apellido, pedido, cantidad, precio, comentario, factura, formaPago, billetePago } = req.body;
+
+        // Validar que `userId` está presente
+        if (!userId) {
+                return res.status(400).json({ message: "El ID del usuario es obligatorio" });
+        }
 
         // Validar los campos obligatorios
         if (!direccion || !nombre || !apellido || !pedido || !cantidad || !precio || !formaPago) {
@@ -51,6 +56,7 @@ export async function createOrder(req, res) {
 
         // Construcción del objeto de orden
         const orderData = {
+            userId, // Asociar pedido con usuario
             direccion,
             nombre,
             apellido,
@@ -61,7 +67,8 @@ export async function createOrder(req, res) {
             factura: facturaData, // Se asigna el valor procesado
             formaPago,
             billetePago: billetePagoData, // Se asigna el valor procesado
-            vuelto: formaPago === "efectivo" ? billetePago - precio : 0 // Calcula el vuelto si es efectivo
+            vuelto: formaPago === "efectivo" ? billetePago - precio : 0 ,// Calcula el vuelto si es efectivo
+            status:"Recibido",
         };
 
         // Guardar en Firestore
@@ -78,20 +85,44 @@ export async function createOrder(req, res) {
         return res.status(500).json({ message: "Error al crear pedido", error: error.message });
     }
 }
+//Obtener pedidos de un usuario específico
+    export async function getOrders(req, res) {
+        try {
+            const { userId } = req.query; // Obtener userId desde los parámetros de la URL
 
-export async function getOrders(req, res) {
-    try {
-        const orderRef = collection(fs, "pedido");
-        const snapshot = await getDocs(orderRef);
+            if (!userId) {
+                return res.status(400).json({ message: "El ID del usuario es obligatorio" });
+            }
 
-        const orderes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const orderRef = collection(fs, "pedido");
+            const q = query(orderRef, where("userId", "==", userId));
+            const snapshot = await getDocs(q);
 
-        return res.status(200).json(orderes);
-    } catch (error) {
-        console.error("Error al obtener pedidos", error);
-        return res.status(500).json({ message: "Error al obtener pedidos", error: error.message });
+            const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            return res.status(200).json(orders);
+        } catch (error) {
+            console.error("Error al obtener pedidos", error);
+            return res.status(500).json({ message: "Error al obtener pedidos", error: error.message });
+       }
     }
-}
+
+    // Obtener todos los pedidos (para el administrador)
+    export async function getAllOrders(req, res) {
+        try {
+            const orderRef = collection(fs, "pedido");
+            const snapshot = await getDocs(orderRef);
+    
+            const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+            return res.status(200).json(orders);
+        } catch (error) {
+            console.error("Error al obtener todos los pedidos", error);
+            return res.status(500).json({ message: "Error al obtener pedidos", error: error.message });
+        }
+    }
+    
+
 
 export async function getOrderId(req, res) {
     try {
@@ -132,19 +163,21 @@ export async function updateOrderStatus(req, res) {
         const orderId = req.params.id;
         const { status } = req.body;
 
-        if (!status) {
-            return res.status(400).json({ message: "El estado del pedido es obligatorio" });
+        const validStatuses = ["Recibido", "Preparación", "En camino", "Entregado"];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({ message: "Estado no válido" });
         }
 
         const orderRef = doc(fs, "pedido", orderId);
         await updateDoc(orderRef, { status });
 
-        return res.status(200).json({ message: "Estado del pedido actualizado exitosamente" });
+        return res.status(200).json({ message: `Estado del pedido actualizado a '${status}'` });
     } catch (error) {
         console.error("Error al actualizar estado de pedido", error);
         return res.status(500).json({ message: "Error al actualizar estado de pedido", error: error.message });
     }
 }
+
 
 export async function deleteOrder(req, res) {
     try {

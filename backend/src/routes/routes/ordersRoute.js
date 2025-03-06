@@ -6,7 +6,7 @@ router.post("/order", createOrder);
 router.get("/orders", getOrders);
 router.get("/order/:id", getOrderId);
 router.put("/order/:id", updateOrder);
-router.put("/order/status/:id", updateOrderStatus);
+router.put("/order/:id/status", updateOrderStatus);
 router.delete("/order/:id", deleteOrder);
 
 export default router;
