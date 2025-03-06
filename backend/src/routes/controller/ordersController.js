@@ -222,7 +222,7 @@ export async function assignMotorized(req, res) {
         }
 
         // Actualizar el pedido con el ID del motorizado
-        await updateDoc(orderRef, { motorizadoId });
+        await updateDoc(orderRef, { motorizadoId: motorizedId });
 
         return res.status(200).json({
             message: "Motorizado asignado exitosamente",
