@@ -201,25 +201,24 @@ export async function assignMotorized(req, res) {
             return res.status(400).json({ message: "Los IDs de pedido y motorizado son obligatorios" });
         }
 
-        // Referencias a los documentos en Firestore
-        const orderRef = doc(fs, "pedido", orderId);
-        const motorizedRef = doc(fs, "usuario", motorizedId);
+        // Referencia a la colección de usuarios
+        const usersRef = collection(fs, "usuario");
+
+        // Consultar los usuarios con el rol de 'motorizado'
+        const q = query(usersRef, where("role", "==", "motorizado"), where("userId", "==", motorizedId));
+        const querySnapshot = await getDocs(q);
+
+        // Verificar si el motorizado con el ID existe
+        if (querySnapshot.empty) {
+            console.log(`No se encontró un motorizado con ID ${motorizedId}`);
+            return res.status(404).json({ message: "El motorizado no existe o no tiene el rol adecuado" });
+        }
 
         // Verificar si el pedido existe
+        const orderRef = doc(fs, "pedido", orderId);
         const orderSnap = await getDoc(orderRef);
         if (!orderSnap.exists()) {
             return res.status(404).json({ message: "El pedido no existe" });
-        }
-
-        // Verificar si el motorizado existe y tiene el rol correcto
-        const motorizedSnap = await getDoc(motorizedRef);
-        if (!motorizedSnap.exists()) {
-            return res.status(404).json({ message: "El usuario no existe" });
-        }
-
-        const motorizedData = motorizedSnap.data();
-        if (motorizedData.role !== "motorizado") {
-            return res.status(400).json({ message: "El usuario no tiene el rol de motorizado" });
         }
 
         // Actualizar el pedido con el ID del motorizado
