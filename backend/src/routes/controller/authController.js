@@ -10,8 +10,8 @@ const saltRounds = 10;
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'lanchado10@gmail.com',
-        pass: 'alex-89omega'
+        user: '',
+        pass: ''
     }
 });
 
@@ -88,7 +88,7 @@ export const resetPassword = async (req, res) => {
         const link = await admin.auth().generatePasswordResetLink(email);
 
         const mailOptions = {
-            from: 'lanchado10@gmail.com',
+            from: '',
             to: email,
             subject: 'Reestablecer la contraseña',
             text: `Haga click en el siguiente link para reestablecer su contraseña: ${link}`
