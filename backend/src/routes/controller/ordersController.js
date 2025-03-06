@@ -191,3 +191,48 @@ export async function deleteOrder(req, res) {
         return res.status(500).json({ message: "Error al eliminar pedido", error: error.message });
     }
 }
+
+// Asignar motorizado a un pedido
+export async function assignMotorized(req, res) {
+    try {
+        const { orderId, motorizedId } = req.body;
+
+        if (!orderId || !motorizedId) {
+            return res.status(400).json({ message: "Los IDs de pedido y motorizado son obligatorios" });
+        }
+
+        // Referencias a los documentos en Firestore
+        const orderRef = doc(fs, "pedido", orderId);
+        const motorizedRef = doc(fs, "usuario", motorizedId);
+
+        // Verificar si el pedido existe
+        const orderSnap = await getDoc(orderRef);
+        if (!orderSnap.exists()) {
+            return res.status(404).json({ message: "El pedido no existe" });
+        }
+
+        // Verificar si el motorizado existe y tiene el rol correcto
+        const motorizedSnap = await getDoc(motorizedRef);
+        if (!motorizedSnap.exists()) {
+            return res.status(404).json({ message: "El usuario no existe" });
+        }
+
+        const motorizedData = motorizedSnap.data();
+        if (motorizedData.role !== "motorizado") {
+            return res.status(400).json({ message: "El usuario no tiene el rol de motorizado" });
+        }
+
+        // Actualizar el pedido con el ID del motorizado
+        await updateDoc(orderRef, { motorizadoId });
+
+        return res.status(200).json({
+            message: "Motorizado asignado exitosamente",
+            orderId,
+            motorizedId,
+        });
+
+    } catch (error) {
+        console.error("Error al asignar motorizado:", error);
+        return res.status(500).json({ message: "Error al asignar motorizado", error: error.message });
+    }
+}

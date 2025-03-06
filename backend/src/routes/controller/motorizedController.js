@@ -1,36 +1,26 @@
 import { fs } from '../../database/firebase.js';
 import { collection, getDocs, getDoc, doc, addDoc, query, where} from 'firebase/firestore';
 
-export async function getAllMotorized(req, res){
-
+export async function getAllMotorized(req, res) {
     try {
-        
-        const userRef = collection(fs, 'usuario');
-        const userSnapshot = await getDocs(userRef);
+        const userRef = collection(fs, "usuario");
 
-        let allMotorized = [];
+        // Consulta para filtrar solo los usuarios con role === "motorizado"
+        const q = query(userRef, where("role", "==", "motorizado"));
+        const userSnapshot = await getDocs(q);
 
-        for(const userDoc of userSnapshot.docs){
-            
-            const motorizedRef = collection(userDoc.ref, 'motorizado');
-            
-            const motorizedSnapshot = await getDocs(motorizedRef);
+        let allMotorized = userSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
 
-            motorizedSnapshot.forEach(doc => {
-                allMotorized.push({
-                    id: doc.id,
-                    ...doc.data()
-                });
-            });
-        }
-        
         return res.status(200).json(allMotorized);
 
     } catch (error) {
-        console.log("Error", error);
+        console.error("Error al obtener los motorizados:", error);
         return res.status(500).json({
             message: "Error al obtener los motorizados",
             error: error.message
-        })
+        });
     }
 }
